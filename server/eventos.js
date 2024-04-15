@@ -55,6 +55,17 @@
                                     jsonRes={evento: eventoRegistered, cartas: ac, isRec: true}
                                     console.log('JSON CARTAS: '+JSON.stringify(jsonRes, null, 2));
                                 }
+                                if(req.query.e.indexOf('jugarcarta_')===0){
+                                    let c=req.query.e.split('_')[1]
+                                    if(req.query.nj==='1'){
+                                        let pos=uCJ1.indexOf(c)
+                                        uCJ1[pos]='vacio'
+                                    }else{
+                                        let pos=uCJ2.indexOf(c)
+                                        uCJ2[pos]='vacio'
+                                    }
+                                    console.log('Evento jugando: '+req.query.e);
+                                }
 
                                 console.log('jsonRes: '+JSON.stringify(jsonRes))
                                 res.status(200).send(jsonRes)
@@ -104,7 +115,7 @@
     }
 
     getCartas = function(req, res){
-        console.log('Consultando cartas: '+req.query.nj)
+        //console.log('Consultando cartas: '+req.query.nj)
         if(req.query.nj==='1'){
             let jsonRes={cartas: uCJ1, isRec: true}
             res.status(200).send(jsonRes)

@@ -1,1 +1,1 @@
-Se agregan imgs
+Se evita que se recarguen cartas ya jugadas.
