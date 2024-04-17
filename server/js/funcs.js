@@ -3,6 +3,7 @@ var host='http://192.168.1.39:8200'
 //var host='http://127.0.0.1:8200'
 const urlParams = new URLSearchParams(window.location.search);
 var nj = -1//urlParams.get('nj');
+var numCartaJudada=1
 var cC=[]
 var uSCartas=''
 document.getElementById('titulo').textContent = 'Truco!';
@@ -69,6 +70,7 @@ function getCartas() {
                 //document.getElementById('c3').textContent = jsonResponse.cartas[2]
                 let nUSCartas=''+jsonResponse.cartas[0]+jsonResponse.cartas[1]+jsonResponse.cartas[2]
                 if(nUSCartas!==uSCartas){
+                    numCartaJudada=1
                     uSCartas=nUSCartas
                     cC=[]
                     cC.push(jsonResponse.cartas[0])
@@ -104,7 +106,7 @@ function jugarCarta(nc) {
 function sendCartas(carta, nc) {
     let d=new Date(Date.now())
     let url=host+'/truco/nuevoEvento'
-    url+='?e=jugarcarta_'+carta+'_'+d.getTime()
+    url+='?e=jugarcarta_'+carta+'_'+numCartaJudada+'_'+d.getTime()
     url+='&nj='+nj
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
@@ -118,6 +120,7 @@ function sendCartas(carta, nc) {
                 const div = document.getElementById(idDiv);
                 const nuevoContenido = '<img id="c"'+nc+' src="imgs/vacio.png" alt="Carta '+nc+'">';
                 div.innerHTML = nuevoContenido;
+                numCartaJudada++//=numCartaJudada + 1
 
                 document.getElementById('salida').textContent += ' '+JSON.stringify(jsonResponse);
 

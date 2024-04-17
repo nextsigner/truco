@@ -1,1 +1,1 @@
-Se logra que se detecten los eventos correctamente en qml
+Se logra mostrar cartas correctamente.
