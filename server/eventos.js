@@ -6,6 +6,8 @@
         nj: Number //Numero de Jugador
     */
 
+    var isNumJugadorSeted=false
+    var numJugadorSeted=-1
     var aCartas=['1o', '2o', '3o', '4o', '5o', '6o', '7o', '10o', '11o', '12o', '1c', '2c', '3c', '4c', '5c', '6c', '7c', '10c', '11c', '12c', '1b', '2b', '3b', '4b', '5b', '6b', '7b', '10b', '11b', '12b', '1e', '2e', '3e', '4e', '5e', '6e', '7e', '10e', '11e', '12e']
 
     var pie='Nadie'
@@ -65,8 +67,8 @@
                                         uCJ2[pos]='vacio'
                                     }
                                     console.log('Evento jugando: '+req.query.e);
+                                    jsonRes={evento: eventoRegistered, cartaJugada: c, isRec: true}
                                 }
-
                                 console.log('jsonRes: '+JSON.stringify(jsonRes))
                                 res.status(200).send(jsonRes)
                             })
@@ -82,7 +84,7 @@
     }
 
     getEventos = function(req, res){
-        console.log('Listando eventos')
+        //console.log('Listando eventos')
         Evento.find({
                         //date: {$gt: h }
                         //date: {$gte: "2019-06-12T00:00:00+01:00", $lte: "2019-12-12T23:00:00+01:00" }
@@ -91,31 +93,30 @@
                     },
                     [], // Columns to Return
                     {
-                        skip:0, // Starting Row
+                        /*skip:0, // Starting Row
                         limit:1, // Ending Row
                         sort:{
-                            fechaRegistro: 1 //Sort by Date Added DESC
-                        }
+                            fechaRegistro: 0 //Sort by Date Added DESC
+                        }*/
                     },
                     function(err, resultados){
                         if(err) res.status(500).send({mensaje: `Error al buscar mensajes: ${err}`})
                         if(resultados.length===0){
-                            console.log('No hay eventos ');
+                            //console.log('No hay eventos ');
                             let jsonRes={evento: resultados, isRec: true}
-                            console.log('jsonRes: '+JSON.stringify(jsonRes))
+                            //console.log('jsonRes: '+JSON.stringify(jsonRes))
                             res.status(200).send(jsonRes)
                             return
                         }else{
-                            console.log('Se muestran todos los eventos registrados');
-                            let jsonRes={evento: resultados, isRec: true}
-                            console.log('jsonRes: '+JSON.stringify(jsonRes))
+                            //console.log('Se muestran todos los eventos registrados');
+                            let jsonRes={evento: resultados[Object.keys(resultados).length-1], isRec: true}
+                            console.log('jsonRes: '+JSON.stringify(jsonRes, null, 2))
                             res.status(200).send(jsonRes)
                         }
                     })
     }
 
     getCartas = function(req, res){
-        //console.log('Consultando cartas: '+req.query.nj)
         if(req.query.nj==='1'){
             let jsonRes={cartas: uCJ1, isRec: true}
             res.status(200).send(jsonRes)
@@ -125,6 +126,29 @@
             let jsonRes={cartas: uCJ2, isRec: true}
             res.status(200).send(jsonRes)
             return
+        }
+    }
+
+    getNuevoNumJugador = function(req, res){
+        console.log('getNuevoNumJugador...')
+        if(!isNumJugadorSeted){
+            console.log('2 getNuevoNumJugador...')
+            numJugadorSeted=getNumJugador()
+            isNumJugadorSeted=true
+            let jsonRes={nuevoNumJugador: numJugadorSeted}
+            res.status(200).send(jsonRes)
+            return
+        }else{
+            console.log('3 getNuevoNumJugador...')
+            if(numJugadorSeted===1){
+                let jsonRes={nuevoNumJugador: 2}
+                res.status(200).send(jsonRes)
+                return
+            }else{
+                let jsonRes={nuevoNumJugador: 1}
+                res.status(200).send(jsonRes)
+                return
+            }
         }
     }
 
@@ -148,16 +172,20 @@
     function generarNumerosAleatorios() {
       const numeros = [];
       while (numeros.length < 6) {
-        const numero = Math.floor(Math.random() * 40) + 1;
+        const numero = Math.floor(Math.random() * 39) + 1;
         if (!numeros.includes(numero)) {
           numeros.push(numero);
         }
       }
       return numeros;
     }
+    function getNumJugador() {
+      return Math.floor(Math.random() * 2) + 1;
+    }
 
     app.get('/truco/nuevoEvento', nuevoEvento);
     app.get('/truco/getEventos', getEventos);
+    app.get('/truco/getNuevoNumJugador', getNuevoNumJugador);
     app.get('/truco/getCartas', getCartas);
 }
 

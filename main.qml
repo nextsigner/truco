@@ -27,7 +27,10 @@ ApplicationWindow{
         id: xApp
         anchors.fill: parent
 
-        ZoolLogView{id: log}
+        ZoolLogView{
+            id: log
+            width: xApp.width*0.5
+        }
 
         Row{
             anchors.right: parent.right
@@ -39,25 +42,11 @@ ApplicationWindow{
     }
     Timer{
         id: tGetStatus
-        running: false//true
+        running: true
         repeat: true
-        interval: 5000
+        interval: 2000
         onTriggered: {
-            let d=new Date(Date.now())
-            let url=app.url
-
-            //Nuevo Evento
-            //url+='/truco/nuevoEvento'
-            //url+='?e=evento_'+d.getTime()
-            //url+='&nj=1'
-
-            //Get Eventos
-            url+='/truco/getEventos'
-
-
-
-            log.lv('url: '+url)
-            app.getRD(url, nuevoEvento)
+            getEventos()
         }
     }
     //-->HTTP
@@ -71,6 +60,7 @@ ApplicationWindow{
                 let dr
                 let j=JSON.parse(data)
                 if(j.isRec){
+                    log.lv('isREC:'+JSON.stringify(j, null, 2))
                     if(j.evento.e.indexOf('repartir_')===0){
                         let m0=j.evento.e.split('_')
                         dr=new Date(parseInt(m0[1]))
@@ -78,6 +68,18 @@ ApplicationWindow{
                         let min=dr.getMinutes()
                         let sec=dr.getSeconds()
                         log.lv('['+h+':'+min+':'+sec+']: Se repartieron cartas.')
+                        //log.lv('Evento: '+j.evento.e)
+                    }
+                    if(j.evento.e.indexOf('jugarcarta_')===0){
+                        //Qt.quit()
+                        let m0=j.evento.e.split('_')
+                        dr=new Date(parseInt(m0[1]))
+                        let h=dr.getHours()
+                        let min=dr.getMinutes()
+                        let sec=dr.getSeconds()
+                        log.lv('['+h+':'+min+':'+sec+']: Evento juganto carta: '+j.evento.nj)
+                        log.lv('['+h+':'+min+':'+sec+']: Evento: '+JSON.stringify(j.evento))
+                        //log.lv('['+h+':'+min+':'+sec+']: Se repartieron cartas.')
                         //log.lv('Evento: '+j.evento.e)
                     }
 
@@ -165,6 +167,12 @@ ApplicationWindow{
         url+='?e=repartir_'+d.getTime()
         url+='&nj=0'
         //log.lv('url: '+url)
+        app.getRD(url, nuevoEvento)
+    }
+    function getEventos(){
+        let d=new Date(Date.now())
+        let url=app.url
+url+='/truco/getEventos'
         app.getRD(url, nuevoEvento)
     }
     //<--Funciones

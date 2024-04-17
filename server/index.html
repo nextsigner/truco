@@ -4,7 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="titulo">Página HTML5 con charset UTF-8</title>
-  <style>
+  <script src="js/funcs.js"></script>
+    <style>
      .contenedor {
        display: flex;
      }
@@ -20,11 +21,12 @@
    </style>
 </head>
 <body>
-  <h1 id="jugador">Jugador Desconocido</h1>
+  <h1 id="jugador">Eligiendo número de Jugador..</h1>
+  <h3 id="pieomano">Eligiendo si sos pie o mano</h3>
   <p>Salida: <span id="salida"></span></p>
-  <p>Cartas: <span id="c1"></span>, <span id="c2"></span>, <span id="c3"></span></p>
+  <!-- <p>Cartas: <span id="c1"></span>, <span id="c2"></span>, <span id="c3"></span></p> -->
 
-<!--<button id="b0" onclick="jugarCarta(0)">Jugar Carta 1</button> -->
+<!-- <button id="b0" onclick="getNuevoNumJugador()">Empezar</button> -->
 
 <div class="contenedor">
    <div id="div1" onclick="jugarCarta(0)" class="columna">
@@ -37,97 +39,4 @@
      <img id="c3" src="imgs/vacio.png" alt="Carta 3">
    </div>
  </div>
-
-  <script>
-    // Obtenemos el valor del parámetro 'nj' de la URL
-    var host='http://192.168.1.39:8200'
-    const urlParams = new URLSearchParams(window.location.search);
-    const nj = urlParams.get('nj');
-    var cC=[]
-    var uSCartas=''
-
-    // Mostramos el valor del parámetro 'nj' en el span
-    document.getElementById('jugador').textContent = 'Jugador N°'+nj;
-    document.getElementById('titulo').textContent = 'Jugador N°'+nj;
-
-
-    function getCartas() {
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', 'http://192.168.1.39:8200/truco/getCartas?nj='+nj, true); // Reemplaza 'https://example.com' con tu URL
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-          if (xhr.status === 200) {
-            const jsonResponse = JSON.parse(xhr.responseText);
-            //alert(JSON.stringify(jsonResponse));
-            document.getElementById('c1').textContent = jsonResponse.cartas[0]
-            document.getElementById('c2').textContent = jsonResponse.cartas[1]
-            document.getElementById('c3').textContent = jsonResponse.cartas[2]
-            let nUSCartas=''+jsonResponse.cartas[0]+jsonResponse.cartas[1]+jsonResponse.cartas[2]
-            if(nUSCartas!==uSCartas){
-                uSCartas=nUSCartas
-                cC=[]
-                cC.push(jsonResponse.cartas[0])
-                cC.push(jsonResponse.cartas[1])
-                cC.push(jsonResponse.cartas[2])
-                //document.getElementById('b0').disabled = false
-                //document.getElementById('b1').disabled = false
-                //document.getElementById('b2').disabled = false
-
-                const div1 = document.getElementById('div1');
-                const nuevoContenido1 = '<img id="c1" src="imgs/'+cC[0]+'.png" alt="Carta 1">';
-                div1.innerHTML = nuevoContenido1;
-
-                const div2 = document.getElementById('div2');
-                const nuevoContenido2 = '<img id="c2" src="imgs/'+cC[1]+'.png" alt="Carta 2">';
-                div2.innerHTML = nuevoContenido2;
-
-                const div3 = document.getElementById('div3');
-                const nuevoContenido3 = '<img id="c3" src="imgs/'+cC[2]+'.png" alt="Carta 3">';
-                div3.innerHTML = nuevoContenido3;
-            }
-          } else {
-            console.error('Error al realizar la solicitud:', xhr.status);
-            alert('Error: '+xhr.status)
-          }
-        }
-      };
-      xhr.send();
-    }
-    setInterval(getCartas, 2000);
-
-    function jugarCarta(nc) {
-        //alert('Has jugado la carta: '+nc);
-        sendCartas(cC[parseInt(nc)], nc)
-    }
-    function sendCartas(carta, nc) {
-      let d=new Date(Date.now())
-      let url=host+'/truco/nuevoEvento'
-      url+='?e=jugarcarta_'+carta+'_'+d.getTime()
-      url+='&nj='+nj
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', url, true); // Reemplaza 'https://example.com' con tu URL
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-          if (xhr.status === 200) {
-
-            const jsonResponse = JSON.parse(xhr.responseText);
-            //alert(JSON.stringify(jsonResponse));
-            let idDiv='div'+parseInt(nc + 1)
-            const div = document.getElementById(idDiv);
-            const nuevoContenido = '<img id="c"'+nc+' src="imgs/vacio.png" alt="Carta '+nc+'">';
-            div.innerHTML = nuevoContenido;
-
-            document.getElementById('b'+nc).disabled = true;
-            //document.getElementById('c1').textContent = jsonResponse.cartas[0]
-            //document.getElementById('c2').textContent = jsonResponse.cartas[1]
-            //document.getElementById('c3').textContent = jsonResponse.cartas[2]
-          } else {
-            console.error('Error al realizar la solicitud:', xhr.status);
-            alert('Error al jugar la carta '+carta+': '+xhr.status)
-          }
-        }
-      };
-      xhr.send();
-    }
-    </script>
 </body>
