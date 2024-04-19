@@ -13,6 +13,12 @@
     var pie='Nadie'
     var uCJ1=[]
     var uCJ2=[]
+    var pinJ1=-10
+    var pinJ2=-10
+    var njDePinJ1=-11
+    var njDePinJ2=-11
+
+    var uSalida=''
 
     nuevoEvento = function(req, res){
         console.log('Insertando Evento con nombre '+req.query.e)
@@ -110,13 +116,29 @@
                         }else{
                             //console.log('Se muestran todos los eventos registrados');
                             let jsonRes={evento: resultados[Object.keys(resultados).length-1], isRec: true}
-                            console.log('jsonRes: '+JSON.stringify(jsonRes, null, 2))
+                            if(JSON.stringify(jsonRes, null, 2) !== uSalida){
+                                console.log('jsonRes: '+uSalida)
+                            }
+                            uSalida=JSON.stringify(jsonRes, null, 2)
                             res.status(200).send(jsonRes)
                         }
                     })
     }
 
     getCartas = function(req, res){
+        let cNJ=req.query.nj
+        let dateError= new Date(Date.now())
+        let h=dateError.getHours()
+        let min=dateError.getMinutes()
+        let sec=dateError.getSeconds()
+        let she='['+h+':'+min+':'+sec+']'
+        console.log('cNJ:'+cNJ)
+        console.log(she+': req.query.nj:'+parseInt(req.query.nj)+' pinJ1:'+parseInt(pinJ1)+' req.query.pin:'+req.query.pin+' pinJ2:'+parseInt(pinJ2))
+        if(req.query.nj==='-1'){
+            let jsonRes={cartas: ['vacio', 'vacio', 'vacio']}
+            res.status(200).send(jsonRes)
+            return
+        }
         if(req.query.nj==='1'){
             let jsonRes={cartas: uCJ1, isRec: true}
             res.status(200).send(jsonRes)
@@ -135,21 +157,56 @@
             console.log('2 getNuevoNumJugador...')
             numJugadorSeted=getNumJugador()
             isNumJugadorSeted=true
-            let jsonRes={nuevoNumJugador: numJugadorSeted}
+            if(numJugadorSeted===1){
+                pinJ1=parseInt(req.query.pin);
+                njDePinJ1=numJugadorSeted;
+                //console.log('1---->pinJ1:'+pinJ1);
+            }else{
+                pinJ2=parseInt(req.query.pin);
+                njDePinJ2=numJugadorSeted;
+                //console.log('1---->pinJ2:'+pinJ2);
+            }
+            let jsonRes={nuevoNumJugador: numJugadorSeted, pin:req.query.pin}
             res.status(200).send(jsonRes)
             return
         }else{
             console.log('3 getNuevoNumJugador...')
             if(numJugadorSeted===1){
-                let jsonRes={nuevoNumJugador: 2}
+                pinJ2=parseInt(req.query.pin);
+                njDePinJ2=2
+                let jsonRes={nuevoNumJugador: 2, pin:req.query.pin}
                 res.status(200).send(jsonRes)
                 return
             }else{
-                let jsonRes={nuevoNumJugador: 1}
+                pinJ1=parseInt(req.query.pin);
+                njDePinJ1=1;
+                let jsonRes={nuevoNumJugador: 1, pin:req.query.pin}
                 res.status(200).send(jsonRes)
                 return
             }
         }
+    }
+
+    consultarNumJugadorPorPin = function(req, res){
+        console.log('consultarNumJugadorPorPin...')
+        let pin=parseInt(req.query.pin)
+        let rnj=-1
+        if(pin===pinJ1)rnj=njDePinJ1
+        if(pin===pinJ2)rnj=njDePinJ2
+        let jsonRes={numJugadorRecuperado: rnj, pin: pin}
+        res.status(200).send(jsonRes)
+        return
+
+    }
+    borrarTodosLosEventos = function(req, res){
+        console.log('Limpiando todos los registros...')
+        Evento.deleteMany({}, (err) => {
+            if (err) {
+                console.error("Error al borrar los registros:", err);
+            } else {
+                console.log("Todos los registros han sido eliminados correctamente.");
+            }
+        });
     }
 
 
@@ -183,9 +240,14 @@
       return Math.floor(Math.random() * 2) + 1;
     }
 
+
+
     app.get('/truco/nuevoEvento', nuevoEvento);
     app.get('/truco/getEventos', getEventos);
     app.get('/truco/getNuevoNumJugador', getNuevoNumJugador);
     app.get('/truco/getCartas', getCartas);
+    app.get('/truco/consultarNumJugadorPorPin', consultarNumJugadorPorPin);
+    app.get('/truco/borrarTodosLosEventos', borrarTodosLosEventos);
+    borrarTodosLosEventos()
 }
 

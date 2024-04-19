@@ -18,6 +18,20 @@
      .columna img {
        width: 100%; /* Ajustar imagen al ancho del div */
      }
+     .overlay {
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 100%;
+         height: 100%;
+         background-color: rgba(0, 0, 0, 1.0); /* Color del fondo semi-transparente */
+         z-index: 9999; /* Z-index alto para asegurarse de que esté encima de todo */
+     }
+     #cerrarSesion {
+         position: absolute;
+         top: 10px; /* Ajusta según la distancia desde la parte superior */
+         right: 10px; /* Ajusta según la distancia desde la derecha */
+     }
    </style>
 </head>
 <body>
@@ -27,7 +41,8 @@
   <!-- <p>Cartas: <span id="c1"></span>, <span id="c2"></span>, <span id="c3"></span></p> -->
 
 <!-- <button id="b0" onclick="getNuevoNumJugador()">Empezar</button> -->
-
+<button id="cerrarSesion" onclick="cerrarSesion()">Cerrar Secion</button>
+<button id="sdfs" onclick="getCartas()">Get Cartas</button>
 <div class="contenedor">
    <div id="div1" onclick="jugarCarta(0)" class="columna">
      <img id="c1" src="imgs/vacio.png" alt="Carta 1">
@@ -38,5 +53,15 @@
    <div id="div3" onclick="jugarCarta(2)" class="columna">
      <img id="c3" src="imgs/vacio.png" alt="Carta 3">
    </div>
+ </div>
+ <div id="panelSetPin" class="overlay">
+     <h1>Bienvenido a Truco!</h1>
+     <p>Para empezar a jugar, primero tenes que crear tu pin.</p>
+     <p><b>Nota:</b> Si o si tiene que ser un pin de 4 número enteros. Por ejemplo 2452, 2244, 2020, etc)</p>
+     <div class="formulario">
+             <h2>Ingresar tu nuevo PIN</h2>
+             <input type="number" id="pin" placeholder="Ingresa un PIN de 6 dígitos" minlength="6" maxlength="6" required>
+             <button onclick="getNuevoNumJugador()">Enviar</button>
+         </div>
  </div>
 </body>
